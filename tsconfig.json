@@ -4,7 +4,8 @@
     "target": "ES6",
     "noEmitOnError": true,
     "noImplicitAny": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
   },
   "include": [
     "app/**/*"

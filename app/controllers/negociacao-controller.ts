@@ -18,26 +18,40 @@ export class NegociacaoController {
     this.negociacoesView.update(this.negociacoes)
   }
 
-  adiciona(): void {
+  public adiciona(): void {
     const negociacao = this.criaNegociacao()
+
+    if (!this.ehDiaUtil(negociacao.data)) {
+      this.mensagemView.update('Apenas necoiações em dias úteis são aceitas')
+      return
+    }
+
     this.negociacoes.adiciona(negociacao)
-    this.mensagemView.update('Negociacao adicionada com sucesso')
-    this.negociacoesView.update(this.negociacoes)
+    this.atualizaView();
     this.limpaFormulario()
   }
 
-  criaNegociacao(): Negociacao {
-    return new Negociacao(
-      this.inputData.valueAsDate,
-      this.inputQuantidade.valueAsNumber,
-      this.inputValor.valueAsNumber
-    )
+  private ehDiaUtil(data: Date): boolean {
+    return !(data.getDay() === 0 || data.getDay() === 6)
   }
 
-  limpaFormulario(): void {
+  private criaNegociacao(): Negociacao {
+    const exp = /-/g;
+    const date = new Date(this.inputData.value.replace(exp, ','));
+    const quantidade = parseInt(this.inputQuantidade.value);
+    const valor = parseFloat(this.inputValor.value);
+    return new Negociacao(date, quantidade, valor);
+  }
+
+  private limpaFormulario(): void {
     this.inputData.value = null
     this.inputQuantidade.valueAsNumber = null
     this.inputValor.valueAsNumber = null
     this.inputData.focus()
+  }
+
+  private atualizaView(): void {
+    this.mensagemView.update('Negociacao adicionada com sucesso')
+    this.negociacoesView.update(this.negociacoes)
   }
 }

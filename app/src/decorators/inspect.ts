@@ -1,6 +1,6 @@
 export function inspect() {
   return function (
-    target: any,
+    _target: any,
     propertyKey: string,
     descriptor: PropertyDescriptor
   ) {

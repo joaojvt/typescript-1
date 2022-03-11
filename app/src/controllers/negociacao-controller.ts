@@ -48,6 +48,14 @@ export class NegociacaoController {
 
   public async importarDados(): Promise<void> {
     const negociacoesDeHoje = await this.negociacoesService.obeterNecodiacoesDoDia()
+      .then(negociacoesDeHoje => {
+        return negociacoesDeHoje.filter(negociacaoDeHoje => {
+          return !this.negociacoes
+            .lista()
+            .some(negociacao => negociacao.ehIgual(negociacaoDeHoje))
+        });
+      })
+
     negociacoesDeHoje.forEach(negociacao => {
       this.negociacoes.adiciona(negociacao)
     })

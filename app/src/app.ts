@@ -14,3 +14,12 @@ form.addEventListener('submit', event => {
   controller.adiciona()
 })
 
+const botaoImporta = document.querySelector('#botao-importa')
+
+if (!botaoImporta) {
+  throw Error('Botao importa não foi encontrato')
+}
+
+botaoImporta.addEventListener('click', () => {
+  controller.importarDados()
+})

@@ -2,8 +2,11 @@ import { domInjector } from "../decorators/dom-injector.js";
 import { inspect } from "../decorators/inspect.js";
 import { logarTempoExecucao } from "../decorators/log-tempo-execucao.js";
 import { DiasDaSemana } from "../enums/dias-da-semana.js";
+import { Imprimivel } from "../interfaces/imprimivel.js";
 import { Negociacao } from "../models/negociacao.js";
 import { Negociacoes } from "../models/negociacoes.js";
+import { NegociacaoService } from "../services/negociacoes-service.js";
+import { imprimir } from "../utils/imprimir.js";
 import { MensagemView } from "../views/mensagem-view.js";
 import { NegociacoesView } from "../views/negociacoes-view.js";
 
@@ -17,6 +20,7 @@ export class NegociacaoController {
   private negociacoes = new Negociacoes();
   private negociacoesView = new NegociacoesView('#negociacoesView');
   private mensagemView = new MensagemView('#mensagemView')
+  private negociacoesService = new NegociacaoService()
 
   constructor() {
     this.negociacoesView.update(this.negociacoes)
@@ -37,33 +41,23 @@ export class NegociacaoController {
     }
 
     this.negociacoes.adiciona(negociacao)
+    imprimir(negociacao, this.negociacoes)
     this.atualizaView();
     this.limpaFormulario()
   }
 
-  public importarDados(): void {
-    fetch('http://localhost:8080/dados')
-      .then(res => res.json())
-      .then((dados: any[]) => {
-        return dados.map(dado => new Negociacao(
-          new Date(),
-          dado.vezes,
-          dado.montante
-        ))
-      })
-      .then(negociacoesDeHoje => {
-        negociacoesDeHoje.forEach(negociacao => {
-          this.negociacoes.adiciona(negociacao)
-        })
-        this.negociacoesView.update(this.negociacoes)
-      })
+  public async importarDados(): Promise<void> {
+    const negociacoesDeHoje = await this.negociacoesService.obeterNecodiacoesDoDia()
+    negociacoesDeHoje.forEach(negociacao => {
+      this.negociacoes.adiciona(negociacao)
+    })
+    this.negociacoesView.update(this.negociacoes)
   }
 
   private ehDiaUtil(data: Date): boolean {
     return data.getDay() !== DiasDaSemana.DOMINGO
       && data.getDay() !== DiasDaSemana.SABADO
   }
-
 
   private limpaFormulario(): void {
     this.inputData.value = ''
